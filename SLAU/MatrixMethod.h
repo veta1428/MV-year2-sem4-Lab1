@@ -9,4 +9,8 @@ double* GaussLinearEq(double** matrix, double* b, int n);
 
 LUP LUPByRow(double** A, int n);
 
+double* LUPSolveLinearEq(LUP lup, double* b);
+
+LDL_T LDLT(double** matrix, int n);
+
 #endif

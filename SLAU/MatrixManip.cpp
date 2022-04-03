@@ -268,3 +268,15 @@ double Obuslovlennost(double** matrix, int n)
 {
 	return Obuslovlennost(matrix, GaussZordanReversedMatrix(matrix, n), n);
 }
+
+double* CopyVector(double* vector, int n) 
+{
+	double* copy = new double[n];
+	memset(copy, 0, sizeof(double) * n);
+
+	for (size_t i = 0; i < n; i++)
+	{
+		copy[i] = vector[i];
+	}
+	return copy;
+}

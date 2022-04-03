@@ -3,8 +3,10 @@
 
 double fRand(double fMin, double fMax) 
 {
-	double f = (double)rand() / RAND_MAX;
-	return fMin + f * (fMax - fMin);
+	//double f = (double)rand() / RAND_MAX;
+	//return fMin + f * (fMax - fMin);
+
+	return rand() % 5;
 }
 
 void MakeRandomSimmetricMatrix(double** matrix, int n, double min, double max) {

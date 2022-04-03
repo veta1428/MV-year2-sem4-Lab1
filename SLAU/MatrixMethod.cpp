@@ -4,6 +4,8 @@
 #include "Models.h"
 #include <cmath>
 #include "Constants.h"
+#include "Printer.h"
+#include <iostream>
 
 double** GaussZordanReversedMatrix(double** matrix, int n)
 {
@@ -59,7 +61,7 @@ double** GaussZordanReversedMatrix(double** matrix, int n)
 
 double* GaussLinearEq(double** matrix, double* b, int n)
 {
-	//allocate memory for solution vector
+		//allocate memory for solution vector
 	double* solution = new double[n];
 	memset(solution, 0, sizeof(double) * n);
 
@@ -81,20 +83,22 @@ double* GaussLinearEq(double** matrix, double* b, int n)
 
 		b[i] /= divideBy;
 
+
 		for (size_t j = i + 1; j < n; j++)
 		{
 			double mainElement = matrix[j][i];
-			LineSubstractAMOtherLine(matrix, i, j, mainElement, n, 0);
+			LineSubstractAMOtherLine(matrix, i, j, mainElement, n, i);
 
 			b[j] -= mainElement * b[i];
 
 			//TODO: do we need to?
-			if (abs(b[j]) < ZERO)
+			if (abs(b[j]) < ZERO) 
 			{
 				b[j] = 0;
 			}
 		}
 	}
+
 
 	for (int i = n - 1; i >= 0; i--)
 	{
@@ -108,6 +112,11 @@ double* GaussLinearEq(double** matrix, double* b, int n)
 		}
 
 		solution[i] = b[i] - sumSolved;
+
+		if (abs(solution[i]) < ZERO)
+		{
+			solution[i] = 0;
+		}
 	}
 
 	return solution;
@@ -148,4 +157,94 @@ LUP LUPByRow(double** A, int n)
 	lup.n = n;
 
 	return lup;
+}
+
+double* LUPSolveLinearEq(LUP lup, double* b) 
+{
+	//LU * x' = b
+
+	//Ly = b
+
+	double* ySolution = new double[lup.n];
+	memset(ySolution, 0, sizeof(double) * lup.n);
+
+
+	for (int i = 0; i < lup.n; i++)
+	{
+		int solved = i;
+
+		double sumSolved = 0;
+
+		for (int j = 0; j < solved; j++)
+		{
+			sumSolved += ySolution[j] * lup.LU[i][j];
+		}
+
+		ySolution[i] = b[i] - sumSolved;
+	}
+
+	// U x' = ySolution
+	//
+
+	double* xMSolution = new double[lup.n];
+	memset(xMSolution, 0, sizeof(double) * lup.n);
+
+	for (int i = lup.n - 1; i >= 0; i--)
+	{
+		int solved = lup.n - 1 - i;
+
+		double sumSolved = 0;
+
+		for (int j = lup.n - 1; j > i; j--)
+		{
+			sumSolved += xMSolution[j] * lup.LU[i][j];
+		}
+
+		xMSolution[i] = (ySolution[i] - sumSolved) / lup.LU[i][i];
+	}
+
+	return xMSolution;
+}
+
+LDL_T LDLT(double** matrix, int n) 
+{
+	bool* isNegative = new bool[n];
+	memset(isNegative, 0, sizeof(bool) * n);
+
+	for (size_t i = 0; i < n; i++)
+	{
+		for (size_t j = i + 1; j < n; j++)
+		{
+			double a = matrix[j][i] / matrix[i][i];
+			LineSubstractAMOtherLine(matrix, i, j, a, n, i);
+		}
+	}
+	std::cout << "\nLDLT \n";
+
+	//divide
+	for (size_t i = 0; i < n; i++)
+	{
+		double diag = matrix[i][i];
+		double sqrtv = 1;
+		if (diag < 0) {
+			isNegative[i] = true;
+			diag *= -1;
+			sqrtv *= -1;
+		}
+
+		sqrtv *= sqrt(diag);
+
+		for (size_t j = i; j < n; j++)
+		{
+			matrix[i][j] /= sqrtv;
+		}
+	}
+
+	PrintMatrix(matrix, n);
+	LDL_T t;
+	t.n = n;
+	t.isNegativeDiag = isNegative;
+	t.LT = matrix;
+
+	return t;
 }

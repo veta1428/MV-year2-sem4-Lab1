@@ -16,4 +16,11 @@ struct LUPFull
 	int n;
 };
 
+struct LDL_T
+{
+	double** LT;
+	bool* isNegativeDiag;
+	int n;
+};
+
 #endif

@@ -35,4 +35,6 @@ double Obuslovlennost(double** matrix, double** reversedMatrix, int n);
 
 double Obuslovlennost(double** matrix, int n);
 
+double* CopyVector(double* vector, int n);
+
 #endif
