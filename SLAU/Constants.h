@@ -1,0 +1,6 @@
+#ifndef _CONSTANTS_REY_GUARD
+#define _CONSTANTS_REY_GUARD
+
+#define ZERO 0.00000000001
+
+#endif

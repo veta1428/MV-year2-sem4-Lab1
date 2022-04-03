@@ -139,7 +139,19 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Generator.cpp" />
+    <ClCompile Include="MatrixManip.cpp" />
+    <ClCompile Include="MatrixMethod.cpp" />
+    <ClCompile Include="Printer.cpp" />
     <ClCompile Include="Source.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Constants.h" />
+    <ClInclude Include="Generator.h" />
+    <ClInclude Include="MatrixManip.h" />
+    <ClInclude Include="MatrixMethod.h" />
+    <ClInclude Include="Models.h" />
+    <ClInclude Include="Printer.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
