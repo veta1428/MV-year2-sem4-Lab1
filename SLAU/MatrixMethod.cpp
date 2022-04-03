@@ -248,3 +248,66 @@ LDL_T LDLT(double** matrix, int n)
 
 	return t;
 }
+
+double* LDLTLinearEq(LDL_T ldlt, double* b) 
+{
+	// LD * Ltx = b
+	// Ltx = y;
+	// y' = Dy
+	// L * y' = b
+	double* yMSolution = new double[ldlt.n];
+	memset(yMSolution, 0, sizeof(double) * ldlt.n);
+
+	for (int i = 0; i < ldlt.n; i++)
+	{
+		int solved = i;
+
+		double sumSolved = 0;
+
+		for (int j = 0; j < solved; j++)
+		{
+			double sol = yMSolution[j];
+			double ldly = ldlt.LT[j][i];
+			sumSolved += yMSolution[j] * ldlt.LT[j][i];
+		}
+
+		double s = (b[i] - sumSolved) / ldlt.LT[i][i];
+		yMSolution[i] = (b[i] - sumSolved) / ldlt.LT[i][i];
+	}
+
+
+	// y' = Dy
+	double* ySolution = new double[ldlt.n];
+	memset(ySolution, 0, sizeof(double) * ldlt.n);
+
+	for (size_t i = 0; i < ldlt.n; i++)
+	{
+		ySolution[i] = yMSolution[i];
+		if (ldlt.isNegativeDiag[i] == true) {
+			ySolution[i] *= -1;
+		}
+	}
+
+	// Ltx = y;
+	double* xSolution = new double[ldlt.n];
+	memset(xSolution, 0, sizeof(double) * ldlt.n);
+
+	for (int i = ldlt.n - 1; i >= 0; i--)
+	{
+		int solved = ldlt.n - 1 - i;
+
+		double sumSolved = 0;
+
+		for (int j = ldlt.n - 1; j > i; j--)
+		{
+			double sol = xSolution[j];
+			double ldly = ldlt.LT[i][j];
+			sumSolved += xSolution[j] * ldlt.LT[i][j];
+		}
+
+		double s = (ySolution[i] - sumSolved) / ldlt.LT[i][i];
+		xSolution[i] = (ySolution[i] - sumSolved) / ldlt.LT[i][i];
+	}
+
+	return xSolution;
+}

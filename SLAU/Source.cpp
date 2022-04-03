@@ -66,6 +66,12 @@ int main()
 	PrintVector(solutionVector, n);
 	
 	double* b = MultMatrixWithVector(matrix, solutionVector, n);
+	b[0] = -180;
+	b[1] = -84;
+	b[2] = 141;
+	std::cout << "\nPrint ldlt solution\n";
+	PrintVector(LDLTLinearEq(ldlt, b), n);
+
 	double* bCopy = CopyVector(b, n);
 
 

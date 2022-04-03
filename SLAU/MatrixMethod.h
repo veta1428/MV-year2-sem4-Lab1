@@ -13,4 +13,6 @@ double* LUPSolveLinearEq(LUP lup, double* b);
 
 LDL_T LDLT(double** matrix, int n);
 
+double* LDLTLinearEq(LDL_T ldlt, double* b);
+
 #endif
