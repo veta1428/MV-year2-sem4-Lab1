@@ -37,4 +37,17 @@ double Obuslovlennost(double** matrix, int n);
 
 double* CopyVector(double* vector, int n);
 
+double** AllocateMatrix(int rows, int columns);
+
+double* Delta(double* firstVector, double* secondVector, int size);
+
+double CubeNormVector(double* vector, int size);
+
+ZeidelMatrix GetZeidelMatrixFromStrongDiagMatrix(double** matrix, int size, double* b);
+
+CastZeidelToIteration GetIterationMatrixFromRelax(ZeidelMatrix zm, double w);
+
+void SumVectors(double* destination, double* source, int size);
+
+void MinusVectors(double* destination, double* source, int size);
 #endif

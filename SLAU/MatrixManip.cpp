@@ -280,3 +280,134 @@ double* CopyVector(double* vector, int n)
 	}
 	return copy;
 }
+
+double** AllocateMatrix(int rows, int columns) {
+	double** matrix = new double* [rows];
+
+	for (size_t i = 0; i < columns; i++)
+	{
+		matrix[i] = new double[columns];
+		memset(matrix[i], 0, sizeof(double) * columns);
+	}
+
+	return matrix;
+}
+
+double* Delta(double* firstVector, double* secondVector, int size) 
+{
+	double* delta = new double[size];
+	memset(delta, 0, sizeof(double) * size);
+
+	for (size_t i = 0; i < size; i++)
+	{
+		delta[i] = firstVector[i] - secondVector[i];
+	}
+	return delta;
+}
+
+double CubeNormVector(double* vector, int size) 
+{
+	double norm = 0;
+
+	for (size_t i = 0; i < size; i++)
+	{
+		if (abs(vector[i]) > norm)
+		{
+			norm = abs(vector[i]);
+		}
+	}
+
+	return norm;
+}
+
+ZeidelMatrix GetZeidelMatrixFromStrongDiagMatrix(double** matrix, int size, double* b) 
+{
+	double** L = AllocateMatrix(size, size);
+	double** R = AllocateMatrix(size, size);
+
+	for (size_t i = 0; i < size; i++)
+	{
+		b[i] = b[i] / matrix[i][i];
+		for (size_t j = 0; j < size; j++)
+		{
+			if (i < j)
+			{
+				R[i][j] = -matrix[i][j] / matrix[i][i];
+			}
+			else if (i > j) {
+				L[i][j] = -matrix[i][j] / matrix[i][i];
+			}
+		}
+	}
+
+	ZeidelMatrix zm;
+	zm.L = L;
+	zm.R = R;
+	zm.size = size;
+	zm.g = b;
+
+	return zm;
+}
+
+CastZeidelToIteration GetIterationMatrixFromRelax(ZeidelMatrix zm, double w) 
+{
+	//xk+1 = (E-wL)^-1 * ((wR + E - wE)xk + wg)
+	//       |_______|   |___________|    |__|
+	//           L_            R_          
+
+
+	//L_
+	for (size_t i = 0; i < zm.size; i++)
+	{
+		zm.L[i][i] = 1;
+		for (size_t j = 0; j < zm.size; j++)
+		{
+			if (i > j)
+			{
+				zm.L[i][j] = -zm.L[i][j] * w;
+			}
+		}
+	}
+
+	double** L_ = GaussZordanReversedMatrix(zm.L, zm.size);
+
+	//R_, g_
+	for (size_t i = 0; i < zm.size; i++)
+	{
+		zm.g[i] *= w;
+		zm.R[i][i] = 1 - w;
+		for (size_t j = 0; j < zm.size; j++)
+		{
+			if (i > j)
+			{
+				zm.R[i][j] = zm.R[i][j] * w;
+			}
+		}
+	}
+
+	double** B_m = MultMatrix(L_, zm.R, zm.size, zm.size, zm.size);
+
+	double* g_m = MultMatrixWithVector(L_, zm.g, zm.size);
+	
+	CastZeidelToIteration cast;
+	cast.B_m = B_m;
+	cast.g_m = g_m;
+
+	return cast;
+}
+void SumVectors(double* destination, double* source, int size) 
+{
+	for (size_t i = 0; i < size; i++)
+	{
+		destination[i] += source[i];
+	}
+}
+
+
+void MinusVectors(double* destination, double* source, int size) 
+{
+	for (size_t i = 0; i < size; i++)
+	{
+		destination[i] -= source[i];
+	}
+}

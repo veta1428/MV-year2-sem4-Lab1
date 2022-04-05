@@ -15,4 +15,6 @@ LDL_T LDLT(double** matrix, int n);
 
 double* LDLTLinearEq(LDL_T ldlt, double* b);
 
+RelaxResult RelaxIterations(double** matrix, double* b, int size, double w);
+
 #endif

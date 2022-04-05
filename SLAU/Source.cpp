@@ -1,97 +1,41 @@
 #include <iostream>
 #include <iomanip>
+#include "Benchmarks.h"
 #include "Models.h"
-#include "Constants.h"
-#include "Generator.h"
-#include "Printer.h"
-#include "MatrixManip.h"
-#include "MatrixMethod.h"
 
 int main() 
 {
-	int n = 3;
-	//float myVar = 11;
-	//double min = -pow(2, myVar / 4);
-	//double max = -min;
+	BenchmarkData bd = TestAll(11, 5, 255);
+	std::cout << "Time:\n";
+	std::cout << "Gauss: " << bd.gaussTimeAVERAGE << "\n";
+	std::cout << "LUP build: " << bd.buildLUPTimeAVERAGE << "\n";
+	std::cout << "LUP solve: " << bd.LUPTimeAVERAGE << "\n";
+	std::cout << "LDLT solve: " << bd.LDLTTimeAVERAGE << "\n";
+	std::cout << "Relax: " << bd.relaxTimeAverage << "\n";
 
-	//1
-	double** matrix = new double*[n];
-	for (size_t i = 0; i < n; i++)
-	{
-		matrix[i] = new double[n];
-		memset(matrix[i], 0, n * sizeof(*matrix[i]));
-	}
+	std::cout << "\n\nGauss:\n";
+	std::cout << "Average delta: " << bd.gaussDeltaAVERAGE << "\n";
+	std::cout << "Min delta: " << bd.gaussDeltaMIN << "\n";
+	std::cout << "Max delta: " << bd.gaussDeltaMAX << "\n";
 
-	MakeRandomSimmetricMatrix(matrix, n, 0, 0);
+	std::cout << "\n\nLUP:\n";
+	std::cout << "Average delta: " << bd.lupDeltaAVERAGE << "\n";
+	std::cout << "Min delta: " << bd.lupDeltaMIN << "\n";
+	std::cout << "Max delta: " << bd.lupDeltaMAX << "\n";
 
-	double** copyMatrixForReverse = CopyMatrix(matrix, n, n);
+	std::cout << "\n\nLDLT\n";
+	std::cout << "Average delta: " << bd.ldltDeltaAVERAGE << "\n";
+	std::cout << "Min delta: " << bd.ldltDeltaMIN << "\n";
+	std::cout << "Max delta: " << bd.ldltDeltaMAX << "\n";
 
-	double** matrixCopy = CopyMatrix(matrix, n, n);
+	std::cout << "\n\nRelax\n";
+	std::cout << "Average iter: " << bd.iterAVERAGE << "\n";
+	std::cout << "Min iter: " << bd.iterMIN << "\n";
+	std::cout << "Max iter: " << bd.iterMAX << "\n";
 
-	matrix[0][0] = 144;
-	matrix[0][1] = -12;
-	matrix[0][2] = -120;
-	matrix[1][0] = -12;
-	matrix[1][1] = -120;
-	matrix[1][2] = -12;
-	matrix[2][0] = -120;
-	matrix[2][1] = -12;
-	matrix[2][2] = 87;
-
-	std::cout << "\nA =\n ";
-	PrintMatrix(matrix, n);
-	//double** matrixCopy = CopyMatrix(matrix, n, n);
-	
-	LDL_T ldlt = LDLT(matrix, n);
-
-	std::cout << "\nprint ldlt\n";
-
-	PrintMatrix(ldlt.LT, n);
-
-	std::cout << "\n";
-	for (size_t i = 0; i < n; i++)
-	{
-		std::cout << ldlt.isNegativeDiag[i] << " ";
-	}
-	
-	double* solutionVector = new double[n];
-
-	//solutionVector[0] = 1;
-	//solutionVector[1] = -2;
-	//solutionVector[2] = -1;
-	MakeRandomVector(solutionVector, n, 0, 0);
-
-	std::cout << "\nSolution vector\n";
-
-	PrintVector(solutionVector, n);
-	
-	double* b = MultMatrixWithVector(matrix, solutionVector, n);
-	b[0] = -180;
-	b[1] = -84;
-	b[2] = 141;
-	std::cout << "\nPrint ldlt solution\n";
-	PrintVector(LDLTLinearEq(ldlt, b), n);
-
-	double* bCopy = CopyVector(b, n);
-
-
-	std::cout << "\n b vector\n";
-	PrintVector(b, n);
-
-	//LDL_T ldlt = LDLT(matrix, n);
-
-	LUP lup = LUPByRow(matrix, n);
-
-	double* solLUP = LUPSolveLinearEq(lup, b);
-	std::cout << "\n Solution by LUP\n";
-
-	PrintVector(solLUP, n);
-	double* solGauss = GaussLinearEq(matrixCopy, bCopy, n);
-
-	
-	//PrintVector(solLUP, n);
-	std::cout << "\n solution vector by gauss\n";
-
-	PrintVector(solGauss, n);
+	std::cout << "\n\nObuslovlennost\n";
+	std::cout << "Average ob: " << bd.obuslovlennostAVERAGE<< "\n";
+	std::cout << "Min ob: " << bd.obuslovlennostMIN << "\n";
+	std::cout << "Max ob: " << bd.obuslovlennostMAX << "\n";
 	return 0;
 }

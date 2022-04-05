@@ -4,7 +4,6 @@
 #include "Models.h"
 #include <cmath>
 #include "Constants.h"
-#include "Printer.h"
 #include <iostream>
 
 double** GaussZordanReversedMatrix(double** matrix, int n)
@@ -219,7 +218,6 @@ LDL_T LDLT(double** matrix, int n)
 			LineSubstractAMOtherLine(matrix, i, j, a, n, i);
 		}
 	}
-	std::cout << "\nLDLT \n";
 
 	//divide
 	for (size_t i = 0; i < n; i++)
@@ -240,7 +238,6 @@ LDL_T LDLT(double** matrix, int n)
 		}
 	}
 
-	PrintMatrix(matrix, n);
 	LDL_T t;
 	t.n = n;
 	t.isNegativeDiag = isNegative;
@@ -310,4 +307,39 @@ double* LDLTLinearEq(LDL_T ldlt, double* b)
 	}
 
 	return xSolution;
+}
+
+RelaxResult RelaxIterations(double** matrix, double* b, int size, double w) 
+{
+	ZeidelMatrix zm = GetZeidelMatrixFromStrongDiagMatrix(matrix, size, b);
+	CastZeidelToIteration cast = GetIterationMatrixFromRelax(zm, w);
+
+	double* solution = new double[size];
+	memset(solution, 1, sizeof(double) * size);
+
+	int counter = 0;
+	while (true) 
+	{
+		counter++;
+		double* multRes = MultMatrixWithVector(cast.B_m, solution, size);
+
+		SumVectors(multRes, cast.g_m, size);
+
+		MinusVectors(solution, multRes, size);
+
+		double norm = CubeNormVector(solution, size);
+
+		solution = multRes;
+		if (norm < E) 
+		{
+			break;
+		}
+	}
+
+	RelaxResult rr;
+
+	rr.solution = solution;
+	rr.iterationAmount = counter;
+
+	return rr;
 }
