@@ -10,6 +10,7 @@
 #include "Printer.h"
 #include "FileManager.h"
 #include "Constants.h"
+#include <fstream>
 
 #define TEST_NUMBER 1
 
@@ -399,8 +400,15 @@ BenchmarkData TestAll(int variant, int tests, int size)
 
 }
 
-ChangeBStatistics TestChangeB(double** matrix, int size, int variant)
+ChangeBStatistics TestChangeB(double** matrix, int size, int variant, std::string filename)
 {
+	std::ofstream foutDB;
+	std::ofstream foutDS;
+
+	std::string fncopy = std::string(filename);
+	foutDB.open(filename.append(".deltaB"), std::ios::trunc);
+	foutDS.open(fncopy.append(".deltaSolution"), std::ios::trunc);
+
 	double* exactSolution = new double[size];
 	double min = -pow(2, variant / 4);
 	double max = -min;
@@ -418,9 +426,7 @@ ChangeBStatistics TestChangeB(double** matrix, int size, int variant)
 	double* copyBToCompare = CopyVector(b, size);
 	double plus = 1.0 / CHANGE_B_DELTAS_AMOUNT;
 
-	//std::cout << "\nExact sol: \n";
-
-	//PrintVector(exactSolution, size);
+	
 
 	double exactSolutionNorm = NormVector(exactSolution, size);
 
@@ -434,15 +440,21 @@ ChangeBStatistics TestChangeB(double** matrix, int size, int variant)
 		MinusVectors(newB, copyBToCompare, size, deltaVectors);
 		double relDelta = NormVector(deltaVectors, size); /// bNorm;
 		bDelta[i] = relDelta;
+		foutDB << relDelta << "\n";
 		LDL_T ldlt = LDLT(workingMatrixCopy, size);
 		double* solution = LDLTLinearEq(ldlt, newB);
-		//double* solution = GaussLinearEq(workingMatrixCopy, newB, size);
+		
+
 		double* deltaSolution = new double[size];
 		MinusVectors(exactSolution, solution, size, deltaSolution);
 
 		double relSolutionNorm = NormVector(deltaSolution, size);// / exactSolutionNorm;
 		solutionDelta[i] = relSolutionNorm;
+		foutDS << relSolutionNorm << "\n";
 	}
+
+	foutDB.close();
+	foutDS.close();
 
 	ChangeBStatistics s;
 	s.bDelta = bDelta;

@@ -7,7 +7,7 @@ BenchmarkData ReportOne(double** matrix, int size, int variant, std::string file
 
 BenchmarkData TestAll(int variant, int tests, int size);
 
-ChangeBStatistics TestChangeB(double** matrix, int size, int variant);
+ChangeBStatistics TestChangeB(double** matrix, int size, int variant, std::string filename);
 
 void CheckWParam(std::string filename, double** matrix, int size, int variant);
 

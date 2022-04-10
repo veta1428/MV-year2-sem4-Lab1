@@ -37,7 +37,7 @@ int main()
 
 	std::cout << "\n*********************A2 b experiments************************\n";
 
-	ChangeBStatistics s = TestChangeB(a2, a2_.rows, MY_VARIANT);
+	ChangeBStatistics s = TestChangeB(a2, a2_.rows, MY_VARIANT, "Tests\\A2");
 
 	PrintVector(s.solutionDelta, s.size);
 	PrintVector(s.bDelta, s.size);
@@ -46,7 +46,7 @@ int main()
 	std::cout << "\n*********************The worst matrix b experiments************************\n";
 
 	Matrix worst = ReadMatrixFromFile("obuslovlennost.biggest");
-	ChangeBStatistics sWorst = TestChangeB(worst.matrix, worst.rows, MY_VARIANT);
+	ChangeBStatistics sWorst = TestChangeB(worst.matrix, worst.rows, MY_VARIANT, "Tests\\Worst");
 	PrintVector(sWorst.solutionDelta, sWorst.size);
 	PrintVector(sWorst.bDelta, sWorst.size);
 	std::cout << sWorst.obuslovlennost;
