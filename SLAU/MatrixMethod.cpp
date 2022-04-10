@@ -62,7 +62,7 @@ double** GaussZordanReversedMatrix(double** matrix, int n)
 
 double* GaussLinearEq(double** matrix, double* b, int n)
 {
-		//allocate memory for solution vector
+	//allocate memory for solution vector
 	double* solution = new double[n];
 	memset(solution, 0, sizeof(double) * n);
 
@@ -91,12 +91,6 @@ double* GaussLinearEq(double** matrix, double* b, int n)
 			LineSubstractAMOtherLine(matrix, i, j, mainElement, n, i);
 
 			b[j] -= mainElement * b[i];
-
-			//TODO: do we need to?
-			if (abs(b[j]) < ZERO) 
-			{
-				b[j] = 0;
-			}
 		}
 	}
 
@@ -113,11 +107,6 @@ double* GaussLinearEq(double** matrix, double* b, int n)
 		}
 
 		solution[i] = b[i] - sumSolved;
-
-		if (abs(solution[i]) < ZERO)
-		{
-			solution[i] = 0;
-		}
 	}
 
 	return solution;
@@ -342,7 +331,6 @@ RelaxResult RelaxIterations(double** matrix, double* b, int size, double w, doub
 	int k = 0;
 	while (true) 
 	{
-		//std::cout << "\nIteration: " << k << "\n";
 		k++;
 		for (size_t i = 0; i < size; i++)
 		{
@@ -363,10 +351,6 @@ RelaxResult RelaxIterations(double** matrix, double* b, int size, double w, doub
 		MinusVectors(nextSolution, solution, size, delta);
 
 		norm = NormVector(delta, size);
-
-		
-
-		//std::cout << "Delta : " << norm << "\n";
 
 		double* temp = solution;
 		solution = nextSolution;

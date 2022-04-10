@@ -118,7 +118,7 @@ void PrintLUP(LUP lup)
 void PrintBenchmarkResult(BenchmarkData bd) 
 {
 	std::cout << "\nWarning! If you see 1e+300 or -1e+300, that means No data for you here\n";
-	std::cout << "\n\nTime:\n";
+	std::cout << "\n\nTime (millisec):\n";
 	std::cout << "Gauss: " << bd.gaussTimeAVERAGE << "\n";
 	std::cout << "LUP build: " << bd.buildLUPTimeAVERAGE << "\n";
 	std::cout << "LUP solve: " << bd.LUPTimeAVERAGE << "\n";

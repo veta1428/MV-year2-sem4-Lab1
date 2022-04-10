@@ -7,7 +7,6 @@
 #include "Models.h"
 #include <iostream>
 #include <chrono>
-#include "Printer.h"
 #include "FileManager.h"
 #include "Constants.h"
 #include <fstream>
@@ -76,9 +75,6 @@ BenchmarkData ReportOne(double** testMatrix, int size, int variant, std::string 
 		//reversed matrix
 		double** reversedMatrix = GaussZordanReversedMatrix(testReversedMatrix, size);
 
-		//PrintMatrix(reversedMatrix, size);
-		//PrintMatrix(MultMatrix(testMatrix, reversedMatrix, size, size, size), size);
-
 		//obuslovlennost
 		double obuslovlennost = Obuslovlennost(testMatrix, reversedMatrix, size);
 		if (obuslovlennost < obuslovlennostMIN) {
@@ -86,7 +82,6 @@ BenchmarkData ReportOne(double** testMatrix, int size, int variant, std::string 
 		}
 		if (obuslovlennost > obuslovlennostMAX) {
 			obuslovlennostMAX = obuslovlennost;
-			//SaveMatrixToFile("obuslovlennost.biggest", size, size, testMatrix);
 		}
 		obuslovlennostAVERAGE += obuslovlennost;
 
@@ -97,9 +92,6 @@ BenchmarkData ReportOne(double** testMatrix, int size, int variant, std::string 
 		gaussTimeAVERAGE += std::chrono::duration_cast<std::chrono::microseconds>(endGauss - startGauss).count();
 
 		double gaussDelta = NormVector(Delta(gaussSolution, predefinedSolution, size), size);
-		std::cout << "\nGauss solution test: \n";
-		PrintVector(gaussSolution, size);
-		PrintVector(predefinedSolution, size);
 
 		if (gaussDelta < gaussDeltaMIN) {
 			gaussDeltaMIN = gaussDelta;
@@ -108,8 +100,6 @@ BenchmarkData ReportOne(double** testMatrix, int size, int variant, std::string 
 			gaussDeltaMAX = gaussDelta;
 		}
 		gaussDeltaAVERAGE += gaussDelta;
-
-		//std::cout << "Gauss delta: " << gaussDelta << "\n";
 
 		auto startBuildLUP = std::chrono::steady_clock::now();
 		LUP lup = LUPByRow(testLUPMatrix, size);
@@ -131,7 +121,6 @@ BenchmarkData ReportOne(double** testMatrix, int size, int variant, std::string 
 			lupDeltaMAX = lupDelta;
 		}
 		lupDeltaAVERAGE += lupDelta;
-		//std::cout << "LUP delta: " << lupDelta << "\n";
 
 		LDL_T ldlt = LDLT(testLDLTMatrix, size);
 
@@ -149,7 +138,6 @@ BenchmarkData ReportOne(double** testMatrix, int size, int variant, std::string 
 			ldltDeltaMAX = ldltDelta;
 		}
 		ldltDeltaAVERAGE += ldltDelta;
-		//std::cout << "LDLT delta: " << ldltDelta << "\n";
 
 		double** L = AllocateMatrix(size, size);
 		double** R = AllocateMatrix(size, size);
@@ -239,11 +227,7 @@ BenchmarkData TestAll(int variant, int tests, int size)
 	{
 		double** testMatrix = AllocateMatrix(size, size);
 
-		
-
 		MakeRandomSimmetricMatrix(testMatrix, size, min, max);
-
-		//PrintMatrix(testMatrix, size);
 
 		double* predefinedSolution = new double[size];
 		memset(predefinedSolution, 0, sizeof(double) * size);
@@ -271,9 +255,6 @@ BenchmarkData TestAll(int variant, int tests, int size)
 		//reversed matrix
 		double** reversedMatrix = GaussZordanReversedMatrix(testReversedMatrix, size);
 		
-		//PrintMatrix(reversedMatrix, size);
-		//PrintMatrix(MultMatrix(testMatrix, reversedMatrix, size, size, size), size);
-		
 		//obuslovlennost
 		double obuslovlennost = Obuslovlennost(testMatrix, reversedMatrix, size);
 		if (obuslovlennost < obuslovlennostMIN) {
@@ -300,8 +281,6 @@ BenchmarkData TestAll(int variant, int tests, int size)
 		}
 		gaussDeltaAVERAGE += gaussDelta;
 
-		//std::cout << "Gauss delta: " << gaussDelta << "\n";
-
 		auto startBuildLUP= std::chrono::steady_clock::now();
 		LUP lup = LUPByRow(testLUPMatrix, size);
 		auto endBuildLUP = std::chrono::steady_clock::now();
@@ -322,7 +301,6 @@ BenchmarkData TestAll(int variant, int tests, int size)
 			lupDeltaMAX = lupDelta;
 		}
 		lupDeltaAVERAGE += lupDelta;
-		//std::cout << "LUP delta: " << lupDelta << "\n";
 
 		LDL_T ldlt = LDLT(testLDLTMatrix, size);
 
@@ -340,7 +318,6 @@ BenchmarkData TestAll(int variant, int tests, int size)
 			ldltDeltaMAX = ldltDelta;
 		}
 		ldltDeltaAVERAGE += ldltDelta;
-		//std::cout << "LDLT delta: " << ldltDelta << "\n";
 
 		double** L = AllocateMatrix(size, size);
 		double** R = AllocateMatrix(size, size);
@@ -400,6 +377,68 @@ BenchmarkData TestAll(int variant, int tests, int size)
 
 }
 
+//ChangeBStatistics TestChangeB(double** matrix, int size, int variant, std::string filename)
+//{
+//	std::ofstream foutDB;
+//	std::ofstream foutDS;
+//
+//	std::string fncopy = std::string(filename);
+//	foutDB.open(filename.append(".deltaB"), std::ios::trunc);
+//	foutDS.open(fncopy.append(".deltaSolution"), std::ios::trunc);
+//
+//	double* exactSolution = new double[size];
+//	double min = -pow(2, variant / 4);
+//	double max = -min;
+//	MakeRandomVector(exactSolution, size, min, max);
+//
+//	double* b = MultMatrixWithVector(matrix, exactSolution, size);
+//	
+//
+//	double* solutionDelta = new double[CHANGE_B_DELTAS_AMOUNT];
+//	double* bDelta = new double[CHANGE_B_DELTAS_AMOUNT];
+//	double** forObuslobl = CopyMatrix(matrix, size, size);
+//
+//	double bNorm = NormVector(b, size);
+//
+//	double* copyBToCompare = CopyVector(b, size);
+//	double plus = 1.0 / CHANGE_B_DELTAS_AMOUNT;
+//
+//	double exactSolutionNorm = NormVector(exactSolution, size);
+//
+//	for (size_t i = 0; i < CHANGE_B_DELTAS_AMOUNT; i++)
+//	{
+//		ElementPlus(b, plus, size);
+//		double* newB = CopyVector(b, size);
+//		double** workingMatrixCopy = CopyMatrix(matrix, size, size);
+//
+//		double* deltaVectors = new double[size];
+//		MinusVectors(newB, copyBToCompare, size, deltaVectors);
+//		double relDelta = NormVector(deltaVectors, size); /// bNorm;
+//		bDelta[i] = relDelta;
+//		foutDB << relDelta << "\n";
+//		LDL_T ldlt = LDLT(workingMatrixCopy, size);
+//		double* solution = LDLTLinearEq(ldlt, newB);
+//		
+//
+//		double* deltaSolution = new double[size];
+//		MinusVectors(exactSolution, solution, size, deltaSolution);
+//
+//		double relSolutionNorm = NormVector(deltaSolution, size);// / exactSolutionNorm;
+//		solutionDelta[i] = relSolutionNorm;
+//		foutDS << relSolutionNorm << "\n";
+//	}
+//
+//	foutDB.close();
+//	foutDS.close();
+//
+//	ChangeBStatistics s;
+//	s.bDelta = bDelta;
+//	s.solutionDelta = solutionDelta;
+//	s.size = CHANGE_B_DELTAS_AMOUNT;
+//	s.obuslovlennost = Obuslovlennost(forObuslobl, size);
+//	return s;
+//}
+
 ChangeBStatistics TestChangeB(double** matrix, int size, int variant, std::string filename)
 {
 	std::ofstream foutDB;
@@ -415,42 +454,42 @@ ChangeBStatistics TestChangeB(double** matrix, int size, int variant, std::strin
 	MakeRandomVector(exactSolution, size, min, max);
 
 	double* b = MultMatrixWithVector(matrix, exactSolution, size);
-	
+
 
 	double* solutionDelta = new double[CHANGE_B_DELTAS_AMOUNT];
 	double* bDelta = new double[CHANGE_B_DELTAS_AMOUNT];
 	double** forObuslobl = CopyMatrix(matrix, size, size);
 
 	double bNorm = NormVector(b, size);
+	double solutionNorm = NormVector(exactSolution, size);
 
-	double* copyBToCompare = CopyVector(b, size);
+	double* solutionToCompare = CopyVector(exactSolution, size);
+	double* bToCompare = CopyVector(b, size);
+
 	double plus = 1.0 / CHANGE_B_DELTAS_AMOUNT;
-
-	
 
 	double exactSolutionNorm = NormVector(exactSolution, size);
 
 	for (size_t i = 0; i < CHANGE_B_DELTAS_AMOUNT; i++)
 	{
-		ElementPlus(b, plus, size);
-		double* newB = CopyVector(b, size);
-		double** workingMatrixCopy = CopyMatrix(matrix, size, size);
+		ElementPlus(exactSolution, plus, size);
+		double* newB = MultMatrixWithVector(matrix, exactSolution, size);
 
 		double* deltaVectors = new double[size];
-		MinusVectors(newB, copyBToCompare, size, deltaVectors);
-		double relDelta = NormVector(deltaVectors, size); /// bNorm;
-		bDelta[i] = relDelta;
-		foutDB << relDelta << "\n";
-		LDL_T ldlt = LDLT(workingMatrixCopy, size);
-		double* solution = LDLTLinearEq(ldlt, newB);
-		
+		MinusVectors(exactSolution, solutionToCompare, size, deltaVectors);
 
-		double* deltaSolution = new double[size];
-		MinusVectors(exactSolution, solution, size, deltaSolution);
+		double relDelta = NormVector(deltaVectors, size) / solutionNorm; /// bNorm;
+		solutionDelta[i] = relDelta;
 
-		double relSolutionNorm = NormVector(deltaSolution, size);// / exactSolutionNorm;
-		solutionDelta[i] = relSolutionNorm;
-		foutDS << relSolutionNorm << "\n";
+		foutDS << relDelta << "\n";
+
+		double* deltaB = new double[size];
+		MinusVectors(newB, bToCompare, size, deltaB);
+
+		double bDeltaNorm = NormVector(deltaB, size) / bNorm;
+
+		bDelta[i] = bDeltaNorm;
+		foutDB << bDeltaNorm << "\n";
 	}
 
 	foutDB.close();

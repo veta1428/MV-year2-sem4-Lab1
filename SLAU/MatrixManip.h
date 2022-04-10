@@ -3,7 +3,6 @@
 
 #include "Models.h"
 
-//TODO: may be can be optimized?
 int ChangeLines(double** matrix, int first, int second, int rowLength);
 
 int ChangeColumns(double** matrix, int first, int second, int columnLength);

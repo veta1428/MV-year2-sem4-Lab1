@@ -3,6 +3,7 @@
 
 #include "Models.h"
 #include <string>
+
 BenchmarkData ReportOne(double** matrix, int size, int variant, std::string filename);
 
 BenchmarkData TestAll(int variant, int tests, int size);

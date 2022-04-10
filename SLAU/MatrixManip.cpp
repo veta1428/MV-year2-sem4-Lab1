@@ -88,9 +88,6 @@ void LineSubstractAMOtherLine(double** matrix, int lineToSubstract, int lineSubs
 	{
 		matrix[lineSubstractFrom][i] -= a * matrix[lineToSubstract][i];
 		double module = abs(matrix[lineSubstractFrom][i]);
-		if (module < ZERO) {
-			matrix[lineSubstractFrom][i] = 0;
-		}
 	}
 }
 
@@ -263,7 +260,6 @@ double Norm(double** matrix, int lines)
 
 double Obuslovlennost(double** matrix, double** reversedMatrix, int n)
 {
-	//std::cout << "\n" << Norm(matrix, n) << "\n" << Norm(reversedMatrix, n) << "\n";
 	return Norm(matrix, n) * Norm(reversedMatrix, n);
 }
 
@@ -357,7 +353,6 @@ CastZeidelToIteration GetIterationMatrixFromRelax(ZeidelMatrix zm, double w)
 	//           L_            R_          
 
 
-	//L_
 	for (size_t i = 0; i < zm.size; i++)
 	{
 		zm.L[i][i] = 1;
@@ -376,20 +371,6 @@ CastZeidelToIteration GetIterationMatrixFromRelax(ZeidelMatrix zm, double w)
 	}
 
 	double** L_ = GaussZordanReversedMatrix(zm.L, zm.size);
-
-	////R_, g_
-	//for (size_t i = 0; i < zm.size; i++)
-	//{
-	//	zm.g[i] *= w;
-	//	zm.R[i][i] = 1 - w;
-	//	for (size_t j = 0; j < zm.size; j++)
-	//	{
-	//		if (i < j)
-	//		{
-	//			zm.R[i][j] = zm.R[i][j] * w;
-	//		}
-	//	}
-	//}
 
 	double** B_m = MultMatrix(L_, zm.R, zm.size, zm.size, zm.size);
 
