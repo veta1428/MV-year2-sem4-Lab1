@@ -1,3 +1,4 @@
+#include "Constants.h"
 #ifndef _MODELS_REY_GUARD
 #define _MODELS_REY_GUARD
 
@@ -45,6 +46,7 @@ struct BenchmarkData
 	double iterMAX;
 	double iterMIN;
 	double iterAVERAGE;
+	double epsilonRelaxationsAVERAGE = E;
 };
 
 struct ZeidelMatrix 
@@ -64,6 +66,21 @@ struct CastZeidelToIteration
 struct RelaxResult {
 	double* solution;
 	int iterationAmount;
+	double e;
+};
+
+struct Matrix {
+	double** matrix;
+	int rows;
+	int columns;
+};
+
+struct ChangeBStatistics 
+{
+	double* solutionDelta;
+	double* bDelta;
+	int size;
+	double obuslovlennost;
 };
 
 #endif

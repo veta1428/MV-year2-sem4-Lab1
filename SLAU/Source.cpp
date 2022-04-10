@@ -2,40 +2,59 @@
 #include <iomanip>
 #include "Benchmarks.h"
 #include "Models.h"
+#include "FileManager.h"
+#include "Printer.h"
+#include "MatrixManip.h"
+#include "Generator.h"
+
+#define MY_VARIANT 11
+#define TEST_NUMBER 1
+#define TEST_MATRIX_SIZE 255
 
 int main() 
 {
-	BenchmarkData bd = TestAll(11, 5, 255);
-	std::cout << "Time:\n";
-	std::cout << "Gauss: " << bd.gaussTimeAVERAGE << "\n";
-	std::cout << "LUP build: " << bd.buildLUPTimeAVERAGE << "\n";
-	std::cout << "LUP solve: " << bd.LUPTimeAVERAGE << "\n";
-	std::cout << "LDLT solve: " << bd.LDLTTimeAVERAGE << "\n";
-	std::cout << "Relax: " << bd.relaxTimeAverage << "\n";
+	BenchmarkData bd = TestAll(MY_VARIANT, TEST_NUMBER, TEST_MATRIX_SIZE);
+	PrintBenchmarkResult(bd);
 
-	std::cout << "\n\nGauss:\n";
-	std::cout << "Average delta: " << bd.gaussDeltaAVERAGE << "\n";
-	std::cout << "Min delta: " << bd.gaussDeltaMIN << "\n";
-	std::cout << "Max delta: " << bd.gaussDeltaMAX << "\n";
+	Matrix a1 = ReadMatrixFromFile("a1.matrix");
+	//PrintMatrix(a1.matrix, a1.rows, a1.columns);
 
-	std::cout << "\n\nLUP:\n";
-	std::cout << "Average delta: " << bd.lupDeltaAVERAGE << "\n";
-	std::cout << "Min delta: " << bd.lupDeltaMIN << "\n";
-	std::cout << "Max delta: " << bd.lupDeltaMAX << "\n";
+	std::cout << "\n*******************A1 matrix test**************************\n";
+	BenchmarkData a1b = ReportOne(a1.matrix, a1.rows, MY_VARIANT, "Tests\\A1_stats_");
+	PrintBenchmarkResult(a1b);
 
-	std::cout << "\n\nLDLT\n";
-	std::cout << "Average delta: " << bd.ldltDeltaAVERAGE << "\n";
-	std::cout << "Min delta: " << bd.ldltDeltaMIN << "\n";
-	std::cout << "Max delta: " << bd.ldltDeltaMAX << "\n";
+	std::cout << "\n*******************A2 matrix test**************************\n";
+	Matrix a2_ = ReadMatrixFromFile("a2.matrix");
+	//PrintMatrix(a2_.matrix, 8);
+	double** copy = CopyMatrix(a2_.matrix, a2_.rows, a2_.columns);
+	double** a2_T = Transpone(copy, a2_.rows);
+	//PrintMatrix(a2_T, 8);
+	double** a2 = MultMatrix(a2_T, a2_.matrix, a2_.rows, a2_.rows, a2_.rows);
+	PrintMatrix(a2, 8);
+	BenchmarkData a2b = ReportOne(a2, a2_.rows, MY_VARIANT, "Tests\\A2_stats_");
+	PrintBenchmarkResult(a2b);
+	//PrintMatrix(a2.matrix, a2.rows, a2.columns);
 
-	std::cout << "\n\nRelax\n";
-	std::cout << "Average iter: " << bd.iterAVERAGE << "\n";
-	std::cout << "Min iter: " << bd.iterMIN << "\n";
-	std::cout << "Max iter: " << bd.iterMAX << "\n";
+	std::cout << "\n*********************A2 b experiments************************\n";
 
-	std::cout << "\n\nObuslovlennost\n";
-	std::cout << "Average ob: " << bd.obuslovlennostAVERAGE<< "\n";
-	std::cout << "Min ob: " << bd.obuslovlennostMIN << "\n";
-	std::cout << "Max ob: " << bd.obuslovlennostMAX << "\n";
+	ChangeBStatistics s = TestChangeB(a2, a2_.rows, MY_VARIANT);
+
+	PrintVector(s.solutionDelta, s.size);
+	PrintVector(s.bDelta, s.size);
+	std::cout << s.obuslovlennost;
+
+	std::cout << "\n*********************The worst matrix b experiments************************\n";
+
+	Matrix worst = ReadMatrixFromFile("obuslovlennost.biggest");
+	ChangeBStatistics sWorst = TestChangeB(worst.matrix, worst.rows, MY_VARIANT);
+	PrintVector(sWorst.solutionDelta, sWorst.size);
+	PrintVector(sWorst.bDelta, sWorst.size);
+	std::cout << sWorst.obuslovlennost;
+
+	//relax 0.8 1.0 1.2
+	CheckWParam("Tests\\A2", a2, a2_.rows, MY_VARIANT);
+	Matrix worstRelax = ReadMatrixFromFile("obuslovlennost.biggest");
+
+	CheckWParam("Tests\\Worst", worstRelax.matrix, worstRelax.rows, MY_VARIANT);
 	return 0;
 }

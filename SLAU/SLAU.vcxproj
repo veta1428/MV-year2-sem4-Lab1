@@ -140,6 +140,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Benchmarks.cpp" />
+    <ClCompile Include="FileManager.cpp" />
     <ClCompile Include="Generator.cpp" />
     <ClCompile Include="MatrixManip.cpp" />
     <ClCompile Include="MatrixMethod.cpp" />
@@ -149,6 +150,7 @@
   <ItemGroup>
     <ClInclude Include="Benchmarks.h" />
     <ClInclude Include="Constants.h" />
+    <ClInclude Include="FileManager.h" />
     <ClInclude Include="Generator.h" />
     <ClInclude Include="MatrixManip.h" />
     <ClInclude Include="MatrixMethod.h" />

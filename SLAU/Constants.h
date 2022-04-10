@@ -2,8 +2,10 @@
 #define _CONSTANTS_REY_GUARD
 #include <float.h>
 
-#define ZERO 0.00000000001
+#define ZERO 0.000000000000001
 
 #define E 0.000000000000001
+
+#define MAX_ITERATIONS_ALLOWED 10000
 
 #endif

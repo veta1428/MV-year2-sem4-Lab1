@@ -14,4 +14,6 @@ void PrintVector(double* b, int n);
 
 void PrintLUP(LUP lup);
 
+void PrintBenchmarkResult(BenchmarkData bd);
+
 #endif

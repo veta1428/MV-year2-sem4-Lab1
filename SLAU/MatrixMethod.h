@@ -2,6 +2,7 @@
 #define _MATRIX_METHOD_REY_GUARD
 
 #include "Models.h"
+#include <string>
 
 double** GaussZordanReversedMatrix(double** matrix, int n);
 
@@ -15,6 +16,6 @@ LDL_T LDLT(double** matrix, int n);
 
 double* LDLTLinearEq(LDL_T ldlt, double* b);
 
-RelaxResult RelaxIterations(double** matrix, double* b, int size, double w);
+RelaxResult RelaxIterations(double** matrix, double* b, int size, double w, double** L, double** R, bool debug = false, double* solution = nullptr, std::string filename = "");
 
 #endif

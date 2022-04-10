@@ -5,6 +5,8 @@
 #include <cmath>
 #include "Constants.h"
 #include <iostream>
+#include "Printer.h"
+#include <fstream>
 
 double** GaussZordanReversedMatrix(double** matrix, int n)
 {
@@ -309,37 +311,95 @@ double* LDLTLinearEq(LDL_T ldlt, double* b)
 	return xSolution;
 }
 
-RelaxResult RelaxIterations(double** matrix, double* b, int size, double w) 
+RelaxResult RelaxIterations(double** matrix, double* b, int size, double w, double** L, double** R, bool debug, double* exactSolution, std::string filename)
 {
-	ZeidelMatrix zm = GetZeidelMatrixFromStrongDiagMatrix(matrix, size, b);
-	CastZeidelToIteration cast = GetIterationMatrixFromRelax(zm, w);
+	RelaxResult rr;
+
+	double _w = 1 - w;
+
+	double* delta = new double[size];
 
 	double* solution = new double[size];
-	memset(solution, 1, sizeof(double) * size);
+	memset(solution, 0, sizeof(double) * size);
 
-	int counter = 0;
+	double* nextSolution = new double[size];
+	double norm = 0;
+
+	//when we know solution
+	double* deltaReal = new double[size];
+	double normDeltaOfExactSolution = 0;
+
+	std::ofstream foutI;
+	std::ofstream foutE;
+
+	if (debug == true)
+	{
+		std::string copy = std::string(filename);
+		foutI.open(filename.append(".I"), std::ios::trunc);
+		foutE.open(copy.append(".E"), std::ios::trunc);
+	}
+	
+	int k = 0;
 	while (true) 
 	{
-		counter++;
-		double* multRes = MultMatrixWithVector(cast.B_m, solution, size);
-
-		SumVectors(multRes, cast.g_m, size);
-
-		MinusVectors(solution, multRes, size);
-
-		double norm = CubeNormVector(solution, size);
-
-		solution = multRes;
-		if (norm < E) 
+		//std::cout << "\nIteration: " << k << "\n";
+		k++;
+		for (size_t i = 0; i < size; i++)
 		{
+			double nextSum = 0;
+			for (size_t j = 0; j < i; j++)
+			{
+				nextSum += matrix[i][j] * nextSolution[j];
+			}
+			double prevSum = 0;
+			for (size_t j = i + 1; j < size; j++)
+			{
+				prevSum += matrix[i][j] * solution[j];
+			}
+
+			nextSolution[i] = _w * solution[i] + w / matrix[i][i] * (b[i] - prevSum - nextSum);
+		}
+
+		MinusVectors(nextSolution, solution, size, delta);
+
+		norm = NormVector(delta, size);
+
+		
+
+		//std::cout << "Delta : " << norm << "\n";
+
+		double* temp = solution;
+		solution = nextSolution;
+		nextSolution = temp;
+
+		if (debug == true) {
+			MinusVectors(nextSolution, solution, size, deltaReal);
+
+			normDeltaOfExactSolution = NormVector(deltaReal, size);
+			foutI << k << "\n";
+			foutE << normDeltaOfExactSolution << "\n";
+		}
+
+		if (norm < E)
+		{
+			rr.e = E;
+			break;
+		}
+
+		if (k > MAX_ITERATIONS_ALLOWED)
+		{
+			rr.e = norm;
 			break;
 		}
 	}
 
-	RelaxResult rr;
+	if (debug == true)
+	{
+		foutI.close();
+		foutE.close();
+	}
 
 	rr.solution = solution;
-	rr.iterationAmount = counter;
-
+	rr.iterationAmount = k;
 	return rr;
 }

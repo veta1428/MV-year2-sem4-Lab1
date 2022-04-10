@@ -25,7 +25,7 @@ int FindBiggestInRow(double** matrix, int columnStartFrom, int row, int rowLengt
 
 double** CopyMatrix(double** A, int rows, int columns);
 
-double CubeNorm(double** matrix, int lines);
+double Norm(double** matrix, int lines);
 
 double AbsSumLine(double** matrix, int line, int lineLength);
 
@@ -41,13 +41,18 @@ double** AllocateMatrix(int rows, int columns);
 
 double* Delta(double* firstVector, double* secondVector, int size);
 
-double CubeNormVector(double* vector, int size);
+double NormVector(double* vector, int size);
 
-ZeidelMatrix GetZeidelMatrixFromStrongDiagMatrix(double** matrix, int size, double* b);
+ZeidelMatrix GetZeidelMatrixFromStrongDiagMatrix(double** matrix, int size, double* b, double** L, double** R);
 
 CastZeidelToIteration GetIterationMatrixFromRelax(ZeidelMatrix zm, double w);
 
 void SumVectors(double* destination, double* source, int size);
 
-void MinusVectors(double* destination, double* source, int size);
+void MinusVectors(double* first, double* second, int size, double* result);
+
+double** Transpone(double** matrix, int size);
+
+void ElementPlus(double* vector, double plus, int size);
+
 #endif

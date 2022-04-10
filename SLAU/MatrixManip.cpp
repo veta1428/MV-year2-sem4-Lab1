@@ -4,6 +4,8 @@
 #include <cmath>
 #include "Models.h"
 #include "MatrixMethod.h"
+#include <iostream>
+#include "Printer.h"
 
 int ChangeLines(double** matrix, int first, int second, int rowLength)
 {
@@ -244,7 +246,7 @@ double AbsSumLine(double** matrix, int line, int lineLength)
 	return sum;
 }
 
-double CubeNorm(double** matrix, int lines)
+double Norm(double** matrix, int lines)
 {
 	double maxSum = 0;
 	for (size_t i = 0; i < lines; i++)
@@ -261,12 +263,14 @@ double CubeNorm(double** matrix, int lines)
 
 double Obuslovlennost(double** matrix, double** reversedMatrix, int n)
 {
-	return CubeNorm(matrix, n) * CubeNorm(reversedMatrix, n);
+	//std::cout << "\n" << Norm(matrix, n) << "\n" << Norm(reversedMatrix, n) << "\n";
+	return Norm(matrix, n) * Norm(reversedMatrix, n);
 }
 
 double Obuslovlennost(double** matrix, int n)
 {
-	return Obuslovlennost(matrix, GaussZordanReversedMatrix(matrix, n), n);
+	double** copy = CopyMatrix(matrix, n, n);
+	return Obuslovlennost(matrix, GaussZordanReversedMatrix(copy, n), n);
 }
 
 double* CopyVector(double* vector, int n) 
@@ -305,7 +309,7 @@ double* Delta(double* firstVector, double* secondVector, int size)
 	return delta;
 }
 
-double CubeNormVector(double* vector, int size) 
+double NormVector(double* vector, int size) 
 {
 	double norm = 0;
 
@@ -320,11 +324,8 @@ double CubeNormVector(double* vector, int size)
 	return norm;
 }
 
-ZeidelMatrix GetZeidelMatrixFromStrongDiagMatrix(double** matrix, int size, double* b) 
+ZeidelMatrix GetZeidelMatrixFromStrongDiagMatrix(double** matrix, int size, double* b, double** L, double** R)
 {
-	double** L = AllocateMatrix(size, size);
-	double** R = AllocateMatrix(size, size);
-
 	for (size_t i = 0; i < size; i++)
 	{
 		b[i] = b[i] / matrix[i][i];
@@ -360,30 +361,35 @@ CastZeidelToIteration GetIterationMatrixFromRelax(ZeidelMatrix zm, double w)
 	for (size_t i = 0; i < zm.size; i++)
 	{
 		zm.L[i][i] = 1;
-		for (size_t j = 0; j < zm.size; j++)
-		{
-			if (i > j)
-			{
-				zm.L[i][j] = -zm.L[i][j] * w;
-			}
-		}
-	}
-
-	double** L_ = GaussZordanReversedMatrix(zm.L, zm.size);
-
-	//R_, g_
-	for (size_t i = 0; i < zm.size; i++)
-	{
 		zm.g[i] *= w;
 		zm.R[i][i] = 1 - w;
 		for (size_t j = 0; j < zm.size; j++)
 		{
 			if (i > j)
 			{
+				zm.L[i][j] = -zm.L[i][j] * w;
+			} else if (i < j)
+			{
 				zm.R[i][j] = zm.R[i][j] * w;
 			}
 		}
 	}
+
+	double** L_ = GaussZordanReversedMatrix(zm.L, zm.size);
+
+	////R_, g_
+	//for (size_t i = 0; i < zm.size; i++)
+	//{
+	//	zm.g[i] *= w;
+	//	zm.R[i][i] = 1 - w;
+	//	for (size_t j = 0; j < zm.size; j++)
+	//	{
+	//		if (i < j)
+	//		{
+	//			zm.R[i][j] = zm.R[i][j] * w;
+	//		}
+	//	}
+	//}
 
 	double** B_m = MultMatrix(L_, zm.R, zm.size, zm.size, zm.size);
 
@@ -404,10 +410,33 @@ void SumVectors(double* destination, double* source, int size)
 }
 
 
-void MinusVectors(double* destination, double* source, int size) 
+void MinusVectors(double* first, double* second, int size, double* result)
 {
 	for (size_t i = 0; i < size; i++)
 	{
-		destination[i] -= source[i];
+		result[i] = second[i] - first[i];
+	}
+}
+
+double** Transpone(double** matrix, int size) 
+{
+	double** transponed = AllocateMatrix(size, size);
+
+	for (size_t i = 0; i < size; i++)
+	{
+		for (size_t j = 0; j < size; j++)
+		{
+			transponed[i][j] = matrix[j][i];
+		}
+	}
+
+	return transponed;
+}
+
+void ElementPlus(double* vector, double plus, int size) 
+{
+	for (size_t i = 0; i < size; i++)
+	{
+		vector[i] += plus;
 	}
 }
