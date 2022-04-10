@@ -16,6 +16,6 @@ LDL_T LDLT(double** matrix, int n);
 
 double* LDLTLinearEq(LDL_T ldlt, double* b);
 
-RelaxResult RelaxIterations(double** matrix, double* b, int size, double w, double** L, double** R, bool debug = false, double* solution = nullptr, std::string filename = "");
+RelaxResult RelaxIterations(double** matrix, double* b, int size, double w, bool debug = false, double* solution = nullptr, std::string filename = "");
 
 #endif

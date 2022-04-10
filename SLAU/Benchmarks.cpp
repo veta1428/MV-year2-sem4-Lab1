@@ -139,10 +139,8 @@ BenchmarkData ReportOne(double** testMatrix, int size, int variant, std::string 
 		}
 		ldltDeltaAVERAGE += ldltDelta;
 
-		double** L = AllocateMatrix(size, size);
-		double** R = AllocateMatrix(size, size);
 		auto startRelax = std::chrono::steady_clock::now();
-		RelaxResult rr = RelaxIterations(testRelaxMatrix, testRelaxVector, size, 1 - (double)variant / 40, L, R, true, copyOfPredSol, filename);
+		RelaxResult rr = RelaxIterations(testRelaxMatrix, testRelaxVector, size, 1 - (double)variant / 40, true, copyOfPredSol, filename);
 		auto endRelax = std::chrono::steady_clock::now();
 		relaxTimeAverage += std::chrono::duration_cast<std::chrono::microseconds>(endRelax - startRelax).count();
 
@@ -322,7 +320,7 @@ BenchmarkData TestAll(int variant, int tests, int size)
 		double** L = AllocateMatrix(size, size);
 		double** R = AllocateMatrix(size, size);
 		auto startRelax = std::chrono::steady_clock::now();
-		RelaxResult rr = RelaxIterations(testRelaxMatrix, testRelaxVector, size, 1 - (double)variant / 40, L, R);
+		RelaxResult rr = RelaxIterations(testRelaxMatrix, testRelaxVector, size, 1 - (double)variant / 40);
 		auto endRelax = std::chrono::steady_clock::now();
 		relaxTimeAverage += std::chrono::duration_cast<std::chrono::microseconds>(endRelax - startRelax).count();
 		eAVERAGE += rr.e;
@@ -376,68 +374,6 @@ BenchmarkData TestAll(int variant, int tests, int size)
 	return bd;
 
 }
-
-//ChangeBStatistics TestChangeB(double** matrix, int size, int variant, std::string filename)
-//{
-//	std::ofstream foutDB;
-//	std::ofstream foutDS;
-//
-//	std::string fncopy = std::string(filename);
-//	foutDB.open(filename.append(".deltaB"), std::ios::trunc);
-//	foutDS.open(fncopy.append(".deltaSolution"), std::ios::trunc);
-//
-//	double* exactSolution = new double[size];
-//	double min = -pow(2, variant / 4);
-//	double max = -min;
-//	MakeRandomVector(exactSolution, size, min, max);
-//
-//	double* b = MultMatrixWithVector(matrix, exactSolution, size);
-//	
-//
-//	double* solutionDelta = new double[CHANGE_B_DELTAS_AMOUNT];
-//	double* bDelta = new double[CHANGE_B_DELTAS_AMOUNT];
-//	double** forObuslobl = CopyMatrix(matrix, size, size);
-//
-//	double bNorm = NormVector(b, size);
-//
-//	double* copyBToCompare = CopyVector(b, size);
-//	double plus = 1.0 / CHANGE_B_DELTAS_AMOUNT;
-//
-//	double exactSolutionNorm = NormVector(exactSolution, size);
-//
-//	for (size_t i = 0; i < CHANGE_B_DELTAS_AMOUNT; i++)
-//	{
-//		ElementPlus(b, plus, size);
-//		double* newB = CopyVector(b, size);
-//		double** workingMatrixCopy = CopyMatrix(matrix, size, size);
-//
-//		double* deltaVectors = new double[size];
-//		MinusVectors(newB, copyBToCompare, size, deltaVectors);
-//		double relDelta = NormVector(deltaVectors, size); /// bNorm;
-//		bDelta[i] = relDelta;
-//		foutDB << relDelta << "\n";
-//		LDL_T ldlt = LDLT(workingMatrixCopy, size);
-//		double* solution = LDLTLinearEq(ldlt, newB);
-//		
-//
-//		double* deltaSolution = new double[size];
-//		MinusVectors(exactSolution, solution, size, deltaSolution);
-//
-//		double relSolutionNorm = NormVector(deltaSolution, size);// / exactSolutionNorm;
-//		solutionDelta[i] = relSolutionNorm;
-//		foutDS << relSolutionNorm << "\n";
-//	}
-//
-//	foutDB.close();
-//	foutDS.close();
-//
-//	ChangeBStatistics s;
-//	s.bDelta = bDelta;
-//	s.solutionDelta = solutionDelta;
-//	s.size = CHANGE_B_DELTAS_AMOUNT;
-//	s.obuslovlennost = Obuslovlennost(forObuslobl, size);
-//	return s;
-//}
 
 ChangeBStatistics TestChangeB(double** matrix, int size, int variant, std::string filename)
 {
@@ -515,9 +451,6 @@ void CheckWParam(std::string filename, double** matrix, int size, int variant)
 
 	double* b = MultMatrixWithVector(matrix, exactSolution, size);
 
-	double** L = AllocateMatrix(size, size);
-	double** R = AllocateMatrix(size, size);
-
 	double** copy08 = CopyMatrix(matrix, size, size);
 	double* b08 = CopyVector(b, size);
 
@@ -527,7 +460,7 @@ void CheckWParam(std::string filename, double** matrix, int size, int variant)
 	double** copy12 = CopyMatrix(matrix, size, size);
 	double* b12 = CopyVector(b, size);
 
-	RelaxIterations(copy08, b08, size, 0.8, L, R, true, exactSolution, filename.append("_0.8_"));
-	RelaxIterations(copy10, b10, size, 1.0, L, R, true, exactSolution, f10.append("_1.0_"));
-	RelaxIterations(copy12, b12, size, 1.2, L, R, true, exactSolution, f12.append("_1.2_"));
+	RelaxIterations(copy08, b08, size, 0.8, true, exactSolution, filename.append("_0.8_"));
+	RelaxIterations(copy10, b10, size, 1.0, true, exactSolution, f10.append("_1.0_"));
+	RelaxIterations(copy12, b12, size, 1.2, true, exactSolution, f12.append("_1.2_"));
 }

@@ -300,7 +300,7 @@ double* LDLTLinearEq(LDL_T ldlt, double* b)
 	return xSolution;
 }
 
-RelaxResult RelaxIterations(double** matrix, double* b, int size, double w, double** L, double** R, bool debug, double* exactSolution, std::string filename)
+RelaxResult RelaxIterations(double** matrix, double* b, int size, double w, bool debug, double* exactSolution, std::string filename)
 {
 	RelaxResult rr;
 
